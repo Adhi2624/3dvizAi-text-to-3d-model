@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download Model</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        a {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            color: #fff;
+            background-color: #007bff;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        a:hover {
+            background-color: #0056b3;
+        }
+        #viewer {
+            width: 100%;
+            max-width: 1000px;
+            height: 600px;
+            background-color: #f0f0f0;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Download Your 3D Model</h1>
+    <a href="{{ url_for('download', filename=mesh_path) }}" download>Download 3D Model</a>
+    
+    <div id="viewer"></div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/loaders/OBJLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/controls/OrbitControls.js"></script>
+    <script>
+        // Initialize the scene, camera, and renderer
+        var scene = new THREE.Scene();
+        var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        var renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.getElementById('viewer').appendChild(renderer.domElement);
+
+        // Set up lighting
+        var light = new THREE.DirectionalLight(0xffffff, 1);
+        light.position.set(1, 1, 1).normalize();
+        scene.add(light);
+        
+        var ambientLight = new THREE.AmbientLight(0x404040); // Ambient light
+        scene.add(ambientLight);
+
+        // Load the 3D model
+        var modelPath = '{{ url_for("download", filename=mesh_path) }}';
+        var loader;
+
+        if (modelPath.endsWith('.obj')) {
+            loader = new THREE.OBJLoader();
+        } else if (modelPath.endsWith('.glb') || modelPath.endsWith('.gltf')) {
+            loader = new THREE.GLTFLoader();
+        }
+
+        if (loader) {
+            loader.load(modelPath, function (object) {
+                scene.add(object.scene || object); // Handle both OBJLoader and GLTFLoader cases
+            }, undefined, function (error) {
+                console.error('An error occurred while loading the model:', error);
+            });
+        }
+
+        // Set the camera position
+        camera.position.z = 5;
+
+        // Initialize OrbitControls
+        var controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.25;
+        controls.enableZoom = true;
+        controls.enablePan = true;
+
+        // Render the scene
+        var animate = function () {
+            requestAnimationFrame(animate);
+            controls.update(); // required if controls.enableDamping or controls.autoRotate are set to true
+            renderer.render(scene, camera);
+        };
+        animate();
+
+        // Adjust camera and renderer size on window resize
+        window.addEventListener('resize', function () {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>

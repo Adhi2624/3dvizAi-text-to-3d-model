@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Image</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            max-width: 800px;
+            width: 100%;
+        }
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+            text-align: center;
+        }
+        .image-selection {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .image-selection div {
+            flex: 1 1 calc(33.333% - 20px);
+            box-sizing: border-box;
+            text-align: center;
+        }
+        .image-selection img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        input[type="submit"] {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        @media (max-width: 600px) {
+            .image-selection div {
+                flex: 1 1 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Select an Image</h1>
+        <form method="post">
+            <div class="image-selection">
+                {% for image in images %}
+                <div>
+                    <!-- Uncomment and adjust if necessary
+                    <img src="{{ url_for('static', filename=image.split('/')[-1]) }}" alt="Generated Image">
+                    -->
+                    <img src="{{ image }}" alt="Generated Image">
+                    <input type="radio" name="selected_image" value="{{ image }}" required> Select
+                </div>
+                {% endfor %}
+            </div>
+            <label for="model_format">Model Format:</label>
+            <select id="model_format" name="model_format">
+                <option value="obj">OBJ</option>
+                <option value="glb">GLB</option>
+            </select>
+            <input type="submit" value="Generate 3D Model">
+        </form>
+    </div>
+</body>
+</html>
